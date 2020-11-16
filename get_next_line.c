@@ -5,60 +5,58 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hwoodwri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/11 12:57:26 by hwoodwri          #+#    #+#             */
-/*   Updated: 2020/11/14 18:38:27 by hwoodwri         ###   ########.fr       */
+/*   Created: 2020/11/16 13:03:56 by hwoodwri          #+#    #+#             */
+/*   Updated: 2020/11/16 21:21:04 by hwoodwri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include "get_next_line.h"
-#define BUFFER_SIZE 4
+#include <stdio.h>
+#define BUFFER_SIZE 6
 
-int get_next_line(int fd, char **line)
+int		get_next_line(int fd, char **line)
 {
-	static char	*ost[1024];
-	char 		*buf;
-	char		*tmp;
+
 	int			bytes;
+	char		*buf;
+	char		*n;
+	static char	*left;
+	int			flag;
 
-	ost = NULL;
-	buf = (char *)malloc(BUFFER_SIZE + 1);
-	while ((bytes = read(fd, buf, BUFFER_SIZE)))
+	flag = 1;
+	buf = malloc(BUFFER_SIZE + 1);
+	
+	if (left)
+		*line = ft_strdup(left);
+	else
+		*line = ft_strdup("");
+	while ((bytes = read(fd, buf, BUFFER_SIZE)) && flag)
 	{
-		if ()
 		buf[bytes] = '\0';
-		ost = ft_strjoin(ost + buf);
+//		printf("%d\n", bytes);
+//		printf("\n%s\n", buf);
+//		ft_strjoin(*line, buf);
+		if ((n = ft_strchr(buf, '\n')))
+		{
+			*n = '\0';
+			n++;
+			left = ft_strdup(n);
+			flag = 0;
+		}
+		*line = ft_strjoin(*line, buf);
 	}
-	return();
-
-/*
-Return value 
-1 : A line has been read
-0 : EOF has been reached
--1 : An error happened
-
-External functs. read, malloc, free
-
-Write a function which returns a line read from a
-file descriptor, without the newline.
-*/
-
-//ssize_t read(int fd, void *buf, size_t count);		
+	return (0);
 }
 
 int main()
 {
-	int fd;
-	char *line;
-	int i;
-	
-	line = NULL; 
-	fd = open("file", O_RDONLY);
-	while ((i = get_next_line(fd, &line)) > 0)
-	{
-		printf("i = %d %s\n", i, line);
-		free(line);
-	}
-	printf("i = %d %s", i, line);
-	free(line);
+	int		fd;
+	char	*line;
+
+	fd = open("test", O_RDONLY);
+
+	get_next_line(fd, &line);
+	printf("--%s--\n", line);
+	get_next_line(fd, &line);
+	printf("--%s--\n", line);
 }
