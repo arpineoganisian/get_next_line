@@ -6,57 +6,91 @@
 /*   By: hwoodwri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/16 13:03:56 by hwoodwri          #+#    #+#             */
-/*   Updated: 2020/11/16 21:21:04 by hwoodwri         ###   ########.fr       */
+/*   Updated: 2020/11/22 21:51:04 by hwoodwri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
-#define BUFFER_SIZE 6
+#define BUFFER_SIZE 16
+
+char	*leftover(char *left, char **line)
+{
+	char	*n;
+
+	n = NULL;
+	if (left)
+	{
+		if ((n = ft_strchr(left, '\n')))
+		{
+			*n = '\0';
+			*line = ft_strdup(left);
+			ft_strcpy(n + 1, left);
+		}
+		else
+		{
+			*line = ft_strdup(left);
+			*left = '\0';
+		}
+	}
+	else
+		*line = ft_strdup("");
+	return (n);
+}
 
 int		get_next_line(int fd, char **line)
 {
-
 	int			bytes;
 	char		*buf;
 	char		*n;
 	static char	*left;
-	int			flag;
+	char		*temp;
 
-	flag = 1;
-	buf = malloc(BUFFER_SIZE + 1);
-	
-	if (left)
-		*line = ft_strdup(left);
-	else
-		*line = ft_strdup("");
-	while ((bytes = read(fd, buf, BUFFER_SIZE)) && flag)
-	{
+	if (fd < 0 || BUFFER_SIZE <= 0 ||
+		!(buf = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
+		return (-1);
+	n = leftover(left, line);
+	while (!n && (bytes = read(fd, buf, BUFFER_SIZE)))
+	{	
+		if (bytes == -1)
+		{	
+			free(buf);
+			return (-1);
+		}
 		buf[bytes] = '\0';
-//		printf("%d\n", bytes);
-//		printf("\n%s\n", buf);
-//		ft_strjoin(*line, buf);
 		if ((n = ft_strchr(buf, '\n')))
 		{
 			*n = '\0';
-			n++;
-			left = ft_strdup(n);
-			flag = 0;
+			left = ft_strdup(n + 1);
 		}
+		temp = *line;
 		*line = ft_strjoin(*line, buf);
+		free(temp);
+		temp = NULL;
 	}
-	return (0);
+	free(buf);
+	return (n ? 1 : 0);
 }
 
 int main()
 {
-	int		fd;
-	char	*line;
+    int     fd;
+    char    *line;
+    int     i;
+	int		count;
 
-	fd = open("test", O_RDONLY);
+	count = 1;
 
-	get_next_line(fd, &line);
-	printf("--%s--\n", line);
-	get_next_line(fd, &line);
-	printf("--%s--\n", line);
+    fd = open("lorem_ipsum", O_RDONLY);
+
+    while ((i = get_next_line(fd, &line)))
+    {
+        printf("/%d/ i is %d/ =%s=\n", count++, i, line);
+        free(line);
+    }
+    printf("/%d/ i is %d/ =%s=\n", count, i, line);
+    free(line);
+    close(fd);
+//	while (1)
+//      ;
 }
