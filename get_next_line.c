@@ -6,31 +6,33 @@
 /*   By: hwoodwri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/16 13:03:56 by hwoodwri          #+#    #+#             */
-/*   Updated: 2020/11/22 21:51:04 by hwoodwri         ###   ########.fr       */
+/*   Updated: 2020/11/24 17:40:27 by hwoodwri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-#define BUFFER_SIZE 16
+//#include <stdio.h>
+//#define BUFFER_SIZE 16
 
-char	*leftover(char *left, char **line)
+char	*leftover(char **left, char **line)
 {
 	char	*n;
 
 	n = NULL;
-	if (left)
+	if (*left)
 	{
-		if ((n = ft_strchr(left, '\n')))
+		if ((n = ft_strchr(*left, '\n')))
 		{
 			*n = '\0';
-			*line = ft_strdup(left);
-			ft_strcpy(n + 1, left);
+			*line = ft_strdup(*left);
+			ft_strcpy(n + 1, *left);
 		}
 		else
 		{
-			*line = ft_strdup(left);
-			*left = '\0';
+
+			*line = ft_strdup(*left);
+			free(*left);
+			*left = NULL;
 		}
 	}
 	else
@@ -46,10 +48,10 @@ int		get_next_line(int fd, char **line)
 	static char	*left;
 	char		*temp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 ||
+	if (fd < 0 || BUFFER_SIZE <= 0 || !line ||
 		!(buf = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (-1);
-	n = leftover(left, line);
+	n = leftover(&left, line);
 	while (!n && (bytes = read(fd, buf, BUFFER_SIZE)))
 	{	
 		if (bytes == -1)
@@ -66,12 +68,11 @@ int		get_next_line(int fd, char **line)
 		temp = *line;
 		*line = ft_strjoin(*line, buf);
 		free(temp);
-		temp = NULL;
 	}
 	free(buf);
 	return (n ? 1 : 0);
 }
-
+/*
 int main()
 {
     int     fd;
@@ -81,7 +82,7 @@ int main()
 
 	count = 1;
 
-    fd = open("lorem_ipsum", O_RDONLY);
+    fd = open("test", O_RDONLY);
 
     while ((i = get_next_line(fd, &line)))
     {
@@ -91,6 +92,7 @@ int main()
     printf("/%d/ i is %d/ =%s=\n", count, i, line);
     free(line);
     close(fd);
-//	while (1)
-//      ;
+	while (1)
+      ;
 }
+*/
