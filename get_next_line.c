@@ -6,30 +6,27 @@
 /*   By: hwoodwri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/16 13:03:56 by hwoodwri          #+#    #+#             */
-/*   Updated: 2020/11/24 17:40:27 by hwoodwri         ###   ########.fr       */
+/*   Updated: 2020/11/24 18:19:40 by hwoodwri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-//#include <stdio.h>
-//#define BUFFER_SIZE 16
 
 char	*leftover(char **left, char **line)
 {
-	char	*n;
+	char	*pointer;
 
-	n = NULL;
+	pointer = NULL;
 	if (*left)
 	{
-		if ((n = ft_strchr(*left, '\n')))
+		if ((pointer = ft_strchr(*left, '\n')))
 		{
-			*n = '\0';
+			*pointer = '\0';
 			*line = ft_strdup(*left);
-			ft_strcpy(n + 1, *left);
+			ft_strcpy(pointer + 1, *left);
 		}
 		else
 		{
-
 			*line = ft_strdup(*left);
 			free(*left);
 			*left = NULL;
@@ -37,62 +34,42 @@ char	*leftover(char **left, char **line)
 	}
 	else
 		*line = ft_strdup("");
-	return (n);
+	return (pointer);
+}
+
+int		ret_value(int bytes, char **pointer)
+{
+	if (bytes == -1)
+		return (-1);
+	if (*pointer)
+		return (1);
+	return (0);
 }
 
 int		get_next_line(int fd, char **line)
 {
 	int			bytes;
 	char		*buf;
-	char		*n;
+	char		*pointer;
 	static char	*left;
 	char		*temp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || !line ||
 		!(buf = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (-1);
-	n = leftover(&left, line);
-	while (!n && (bytes = read(fd, buf, BUFFER_SIZE)))
-	{	
-		if (bytes == -1)
-		{	
-			free(buf);
-			return (-1);
-		}
+	pointer = leftover(&left, line);
+	while (!pointer && (bytes = read(fd, buf, BUFFER_SIZE)) > 0)
+	{
 		buf[bytes] = '\0';
-		if ((n = ft_strchr(buf, '\n')))
+		if ((pointer = ft_strchr(buf, '\n')))
 		{
-			*n = '\0';
-			left = ft_strdup(n + 1);
+			*pointer = '\0';
+			left = ft_strdup(pointer + 1);
 		}
 		temp = *line;
 		*line = ft_strjoin(*line, buf);
 		free(temp);
 	}
 	free(buf);
-	return (n ? 1 : 0);
+	return ((ret_value(bytes, &pointer)));
 }
-/*
-int main()
-{
-    int     fd;
-    char    *line;
-    int     i;
-	int		count;
-
-	count = 1;
-
-    fd = open("test", O_RDONLY);
-
-    while ((i = get_next_line(fd, &line)))
-    {
-        printf("/%d/ i is %d/ =%s=\n", count++, i, line);
-        free(line);
-    }
-    printf("/%d/ i is %d/ =%s=\n", count, i, line);
-    free(line);
-    close(fd);
-	while (1)
-      ;
-}
-*/

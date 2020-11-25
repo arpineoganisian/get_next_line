@@ -6,7 +6,7 @@
 /*   By: hwoodwri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/16 13:28:50 by hwoodwri          #+#    #+#             */
-/*   Updated: 2020/11/19 20:18:39 by hwoodwri         ###   ########.fr       */
+/*   Updated: 2020/11/24 18:20:59 by hwoodwri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		j++;
 		i++;
 	}
-//	free((char *)s2);
 	s3[i] = '\0';
 	return (s3);
 }
@@ -96,16 +95,4 @@ char	*ft_strcpy(char const *s1, char *s2)
 	}
 	s2[i] = '\0';
 	return (s2);
-}
-
-void	ft_strclr(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i])
-	{
-		str[i] = '\0';
-		i++;
-	}
 }
